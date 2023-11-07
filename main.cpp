@@ -7,7 +7,8 @@ using namespace std;
 
 void show ( double[][5] , int ) ;
 void show_det ( int[][3] , int ) ;
-void show_st( double[][9] , int , int  );
+void show_st( int[][9] , int  );
+
 
 int main()
 {
@@ -16,7 +17,7 @@ int main()
     int n = 0 ;
     cout << "Enter your n value : " ;
     cin >> n ;
-    double arrival [0][5] = {0};
+    double arrival[n][5] = {0};
     for ( int i = 0 ; i <= n - 1 ; i++ )
     {
         cout << "Please set your " << i + 1 << " arrival time : " ;
@@ -157,6 +158,7 @@ int main()
     int k = 0 ;
     cout << "Enter your k value : " ;
     cin >> k ;
+    int qq = k ;
     int adet[k][3] = {0};
     for ( int i = 0 ; i <= k - 1 ; i++ )
     {
@@ -224,58 +226,112 @@ int main()
 
     /*Step 5 */
     cout << "Step 5 : Simulation table for queuing problem : " << endl ;
-    double simt[k][9] = {0};
+    int simt[qq][9] = {0};
 
-    for ( int i = 0 ; i <= k - 1 ; i++ )
+    for ( int i = 0 ; i <= qq - 1 ; i++ )
     {
         simt[i][0] = i + 1 ;
     }
 
-    for ( int i = 0 ; i <= k - 1 ; i++ )
+    for ( int i = 0 ; i <= qq - 1 ; i++ )
     {
-        for ( int j = 0 ; j <= k - 1 ; j++ )
-        simt[i][1] = adet[i][j] ;
+        simt[i][1] = adet[i][2] ;
     }
 
     simt[0][2] = 0 ;
-    for ( int i = 0 ; i <= k - 1 ; i++ )
+    for ( int i = 0 ; i <= qq - 1 ; i++ )
     {
         simt[i][2] = simt[i][1] + simt[i-1][2] ;
     }
 
-    for ( int i = 0 ; i <= k - 1 ; i++ )
+    for ( int i = 0 ; i <= qq - 1 ; i++ )
     {
         simt[i][3] = sdet[i][2] ;
     }
-
+    /*
     int timeline = 4 ;
     simt[0][4] = 0 ;
-    for ( int i = 1 ; i <= k - 1 ; i++ )
+    int tt = 0 ;
+    for ( int i = 1 ; i <= qq - 1 ; i++ )
     {
 
         if ( simt[i][2] < timeline )
         {
-            while ( (simt[i-1][2] + simt[i-1][3]) > simt[i][2] )
-            {
-                timeline++;
-            }
+            tt = simt[i][2] ;
+            timeline = simt[i-1][2] + simt[i-1][3] ;
             simt[i][4] = timeline ;
+            timeline = timeline + simt[i][4] ;
         }
-        else if ( simt[i][2] > timeline )
+        else if ( simt[i][2] >= timeline )
         {
-            simt[i][4] = simt[i][2] ;
-            timeline += simt[i][3] ;
+            simt[i][4] = timeline ;
+            timeline = simt[i][3] + simt[i][2] ;
+        }
+    }*/
+    for ( int i = 1 ; i <= qq - 1 ; i++ )
+    {
+        if ( simt[i-1][3] + simt[i-1][2] > simt[i][2] )
+        {
+            simt[i][4] = simt[i-1][3] + simt[i-1][2] ;
         }
         else
         {
-
+            simt[i][4] = simt[i][2] ;
         }
     }
+
+    for ( int i = 1 ; i <= qq - 1 ; i++ )
+    {
+        simt[i][5] = simt[i][4] - simt[i][2] ;
+    }
+
+    for ( int i = 1 ; i <= qq - 1 ; i++ )
+    {
+        simt[i][6] = simt[i][4] + simt[i][3] ;
+    }
+
+    for ( int i = 1 ; i <= qq - 1 ; i++ )
+    {
+        simt[i][7] = simt[i][6] - simt[i][2] ;
+    }
+
+    for ( int i = 1 ; i <= qq - 1 ; i++ )
+    {
+        simt[i][8] = simt[i][4] - simt[i-1][6] ;
+    }
+
+
     /* Step 5 */
 
+    /* Step 6 */
+    double average_waiting_time_for_customer = 0 ;
+    int sum = 0 ;
+    for ( int i = 0 ; i <= qq - 1 ; i++ )
+    {
+        sum += simt[i][5] ;
+    }
+    average_waiting_time_for_customer = ( (sum) * 1.0 ) / qq ;
+    /* Step 6 */
 
+    /* Step 7 */
+    double average_queue_length ;
+    int sum1 = 0 ;
+    for ( int i = 0 ; i <= qq - 1 ; i++ )
+    {
+        sum1 += simt[i][4] ;
+    }
+    average_queue_length = ( (sum1) * 1.0 ) / qq ;
+    /* Step 7 */
 
-
+    /* Step 8 */
+    double average_time_spent_by_customer ;
+    int sum2 = 0 ;
+    for ( int i = 0 ; i <= qq - 1 ; i++ )
+    {
+        sum2 += simt[i][7] ;
+    }
+    average_time_spent_by_customer = ( (sum2) * 1.0 ) / qq ;
+    /* Step 8 */
 
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     int request = 100 ;
@@ -287,9 +343,16 @@ int main()
              << "\n 3-Show TBA Determination  "
              << "\n 4-Show ST Determination "
              << "\n 5-Show Simulation Table "
+             << "\n 6-Average Waiting Time For Customer : "
+             << "\n 7-Average Queue Length : "
+             << "\n 8-Average time spent by a customer : "
              << "\n 0-Exit" << endl ;
         cin >> request ;
-        if ( request == 1 )
+        if ( request == 0 )
+        {
+            break;
+        }
+        else if ( request == 1 )
         {
             show ( arrival , n );
         }
@@ -307,7 +370,23 @@ int main()
         }
         else if ( request == 5 )
         {
-            show_st( simt , 9 , k );
+            show_st( simt , qq );
+        }
+        else if ( request == 6 )
+        {
+            cout << "Average waiting time for customer is : " << setiosflags( ios:: fixed | ios::fixed )
+                 << setprecision(2) << average_waiting_time_for_customer << endl ;
+        }
+        else if ( request == 7 )
+        {
+            cout << "Average queue length is : " << setiosflags( ios:: fixed | ios::fixed )
+                 << setprecision(2) << average_queue_length << endl ;
+        }
+        else if ( request == 8 )
+        {
+            cout << "Average time spent by a customer  : " << setiosflags( ios:: fixed | ios::fixed )
+                 << setprecision(2) << average_time_spent_by_customer << endl ;
+
         }
     }
 
@@ -353,13 +432,23 @@ void show_det ( int execute[][3] , int n )
         }
 }
 
-void show_st( double execute [][9] , int n , int k )
+void show_st( int execute[][9]  , int k )
 {
+    cout << setw(13)<< "Customer"
+         << setw(13)<< "T.S.L.A"
+         << setw(11)<< "A.T"
+         << setw(13)<< "S.T"
+         << setw(13)<< "T.S.B"
+         << setw(13)<< "T.C.W.Q"
+         << setw(13) << "T.S.E"
+         << setw(13)<< "T.C.S.S"
+         << setw(13) << "I.T.S"
+         << endl ;
     for ( int i = 0 ; i <= k - 1 ; i++ )
         {
             for ( int j = 0 ; j <= 8 ; j++ )
             {
-                cout <<  execute[i][j]  << "   " ;
+                cout << setw(10) << execute[i][j]  << "   " ;
             }
             cout << endl ;
         }
