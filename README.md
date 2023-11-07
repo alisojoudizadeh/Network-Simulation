@@ -40,5 +40,5 @@ $ ./queuing_simulation
 	•	0: Exit the program.
 
 License
-
+Especial Thanks To Nima Afkham 
 This code is available under the "Sahand University of Technology" License.
